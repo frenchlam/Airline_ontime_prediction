@@ -1,7 +1,3 @@
-
-// ###Machine Learning
-
-
 // # Departure delay prediction
 // 
 // ###Objective :
@@ -15,9 +11,21 @@
 
 // #### push files to HDFS
 import sys.process._
-"hdfs dfs -put data/flights_ORD2007.csv.bz2 /tmp/mlamairesse/flights" !
-"hdfs dfs -put data/flights_ORD2008.csv.bz2 /tmp/mlamairesse/flights" !
-"hdfs dfs -put data/flights_O.csv.bz2 /tmp/mlamairesse/flights" !
+"hadoop fs -rmdir --ignore-fail-on-non-empty /tmp/mlamairesse/flights" !
+"hadoop fs -rmdir --ignore-fail-on-non-empty /tmp/mlamairesse/weather" !
+
+"hdfs dfs -mkdir -p /tmp/mlamairesse/flights" !
+"hdfs dfs -mkdir -p /tmp/mlamairesse/weather" !
+
+"hdfs dfs -put data/flights_ORD_2007.csv.bz2 /tmp/mlamairesse/flights" !
+"hdfs dfs -put data/flights_ORD_2008.csv.bz2 /tmp/mlamairesse/flights" !
+"hdfs dfs -put data/weather2007_USW00094846.csv /tmp/mlamairesse/weather" !
+
+//check 
+"hdfs dfs -ls /tmp/mlamairesse/flights" !
+
+val flights_data = "/tmp/mlamairesse/flights"
+val weather_data = "/tmp/mlamairesse/weather"
 
 // ####create context
 import org.apache.spark.sql.SparkSession
@@ -30,7 +38,6 @@ val spark = SparkSession.
 
 // For implicit conversions like converting RDDs to DataFrames
 import spark.implicits._
-
 
 
 // ### Pre Processing 
@@ -93,14 +100,14 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.types._
 
 //filter data on flights departing from ORD (chicago)
-val flightsRaw_df = sqlContext.read.format("csv")
-  .option("delimiter",",")
-  .option("quote","")
-  .option("header", "true")
-  .option("nullValue", "NA")
+val flightsRaw_df = spark.read.format("csv").
+  option("delimiter",",").
+  option("quote","").
+//  option("header", "true").
+  option("nullValue", "NA").
 //  .option("dateFormat", "")
-  .load(Flight_Data)
-  .filter($"Origin" === "ORD" ).cache()
+  load(flights_data).
+  filter($"Origin" === "ORD" ).cache()
 
 flightsRaw_df.createOrReplaceTempView("flights_raw")
 
