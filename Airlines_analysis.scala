@@ -11,14 +11,14 @@
 
 // #### push files to HDFS
 import sys.process._
-"hadoop fs -rmdir --ignore-fail-on-non-empty /tmp/mlamairesse/flights" !
-"hadoop fs -rmdir --ignore-fail-on-non-empty /tmp/mlamairesse/weather" !
+"hadoop fs -rm -r -f /tmp/mlamairesse/flights" !
+"hadoop fs -rm -r -f /tmp/mlamairesse/weather" !
 
 "hdfs dfs -mkdir -p /tmp/mlamairesse/flights" !
 "hdfs dfs -mkdir -p /tmp/mlamairesse/weather" !
 
-"hdfs dfs -put data/flights_ORD_2007.csv.bz2 /tmp/mlamairesse/flights" !
-"hdfs dfs -put data/flights_ORD_2008.csv.bz2 /tmp/mlamairesse/flights" !
+"hdfs dfs -put data/flights_ORD_2007.csv /tmp/mlamairesse/flights" !
+"hdfs dfs -put data/flights_ORD_2008.csv /tmp/mlamairesse/flights" !
 "hdfs dfs -put data/weather2007_USW00094846.csv /tmp/mlamairesse/weather" !
 
 //check 
@@ -103,7 +103,7 @@ import org.apache.spark.sql.types._
 val flightsRaw_df = spark.read.format("csv").
   option("delimiter",",").
   option("quote","").
-//  option("header", "true").
+  option("header", "true").
   option("nullValue", "NA").
 //  .option("dateFormat", "")
   load(flights_data).
